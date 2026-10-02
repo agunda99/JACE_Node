@@ -9,14 +9,17 @@ A Node.js USSD callback for event ticket registration and Pochi la Biashara paym
 
 ## Setup
 
-Install dependencies and create a local environment file:
+Install dependencies, then create a local `.env` file in the project root with your own settings:
 
-```powershell
-npm ci
-Copy-Item .env.example .env
+```dotenv
+EVENT_NAME="Your Event Name"
+TICKET_PRICE=400
+POCHI_NUMBER=YOUR_POCHI_NUMBER
+MONGO_URI=mongodb://127.0.0.1:27017/events
+PORT=3000
 ```
 
-Edit `.env` and set the event name, ticket price, Pochi number, and MongoDB connection string. `.env` contains private configuration and is ignored by Git.
+`.env` contains private configuration and is ignored by Git. Do not commit it.
 
 ## Run
 
