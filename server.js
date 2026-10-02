@@ -29,6 +29,10 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 const app = express();
 app.use(express.urlencoded({ extended: false })); // Africa's Talking sends form data
 
+app.get("/", (_req, res) => {
+  res.json({ status: "ok", message: "JACE USSD service is running", ussdCallback: "POST /ussd" });
+});
+
 app.post("/ussd", async (req, res) => {
   const { sessionId, phoneNumber, text } = req.body;
   res.set("Content-Type", "text/plain");

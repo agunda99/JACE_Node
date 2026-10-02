@@ -47,4 +47,4 @@ Check JavaScript syntax with:
 npm run check
 ```
 
-Configure Africa's Talking to send USSD callbacks to `https://YOUR-DOMAIN/ussd`. Use HTTPS for a deployed callback. This service stores attendee names and phone numbers in Supabase; restrict access and handle that data according to your privacy requirements.
+Configure Africa's Talking to send USSD callbacks to `https://YOUR-RENDER-SERVICE.onrender.com/ussd` using POST. Do not use the root URL as the callback; `GET /` is only a status response. If the sandbox still shows Africa's Talking's generic greeting instead of the event menu, verify that the sandbox USSD code/app is configured to use this callback URL. Use HTTPS for deployment. This service stores attendee names and phone numbers in Supabase; restrict access and handle that data according to your privacy requirements.
