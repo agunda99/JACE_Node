@@ -1,0 +1,28 @@
+{
+  "name": "jace_node",
+  "version": "1.0.0",
+  "description": "USSD ticket registration and payment instructions service",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --env-file=.env server.js",
+    "dev": "node --watch --env-file=.env server.js",
+    "check": "node --check server.js"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/agunda99/JACE_Node.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/agunda99/JACE_Node/issues"
+  },
+  "homepage": "https://github.com/agunda99/JACE_Node#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.10.3"
+  }
+}

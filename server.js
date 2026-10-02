@@ -1,16 +1,22 @@
-// Minimal USSD app: collects name + phone, shows Pochi la Biashara payment details.
-// Setup:  npm init -y && npm install express mongoose
-// Run:    MONGO_URI="your-mongodb-uri" node server.js
-// Africa's Talking USSD callback URL: https://YOUR-DOMAIN/ussd
-
 const express = require("express");
 const mongoose = require("mongoose");
 
-// ---------- EDIT THESE ----------
-const EVENT_NAME = "Odongo Swagg Live Band";
-const TICKET_PRICE = 400; // KSh
-const POCHI_NUMBER = "0707014085"; // your Pochi la Biashara number
-// --------------------------------
+const { EVENT_NAME, POCHI_NUMBER, MONGO_URI } = process.env;
+const TICKET_PRICE = Number(process.env.TICKET_PRICE);
+const PORT = Number(process.env.PORT || 3000);
+
+const missingConfig = ["EVENT_NAME", "TICKET_PRICE", "POCHI_NUMBER", "MONGO_URI"].filter(
+  (key) => !process.env[key]
+);
+if (missingConfig.length > 0) {
+  throw new Error(`Missing required environment variables: ${missingConfig.join(", ")}`);
+}
+if (!Number.isFinite(TICKET_PRICE) || TICKET_PRICE <= 0) {
+  throw new Error("TICKET_PRICE must be a positive number");
+}
+if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
+  throw new Error("PORT must be an integer between 1 and 65535");
+}
 
 const attendeeSchema = new mongoose.Schema({
   sessionId: { type: String, unique: true },
@@ -66,9 +72,11 @@ app.post("/ussd", async (req, res) => {
 });
 
 mongoose
-  .connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/events")
+  .connect(MONGO_URI)
   .then(() => {
-    const port = process.env.PORT || 3000;
-    app.listen(port, () => console.log(`USSD server running on port ${port}`));
+    app.listen(PORT, () => console.log(`USSD server running on port ${PORT}`));
   })
-  .catch((err) => console.error("MongoDB connection failed:", err));
+  .catch((err) => {
+    console.error("MongoDB connection failed:", err);
+    process.exitCode = 1;
+  });
