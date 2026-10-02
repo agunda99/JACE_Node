@@ -48,3 +48,5 @@ npm run check
 ```
 
 Configure Africa's Talking to send USSD callbacks to `https://YOUR-RENDER-SERVICE.onrender.com/ussd` using POST. Do not use the root URL as the callback; `GET /` is only a status response. If the sandbox still shows Africa's Talking's generic greeting instead of the event menu, verify that the sandbox USSD code/app is configured to use this callback URL. Use HTTPS for deployment. This service stores attendee names and phone numbers in Supabase; restrict access and handle that data according to your privacy requirements.
+
+The USSD flow records an attendee after they choose to register and submit their name. It then displays manual Pochi la Biashara payment instructions; it does not initiate an M-Pesa payment prompt or verify payment. Automatic collection requires a configured payment provider integration.
