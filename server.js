@@ -1,13 +1,17 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const { createClient } = require("@supabase/supabase-js");
 
-const { EVENT_NAME, POCHI_NUMBER, MONGO_URI } = process.env;
+const { EVENT_NAME, POCHI_NUMBER, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
 const TICKET_PRICE = Number(process.env.TICKET_PRICE);
 const PORT = Number(process.env.PORT || 3000);
 
-const missingConfig = ["EVENT_NAME", "TICKET_PRICE", "POCHI_NUMBER", "MONGO_URI"].filter(
-  (key) => !process.env[key]
-);
+const missingConfig = [
+  "EVENT_NAME",
+  "TICKET_PRICE",
+  "POCHI_NUMBER",
+  "SUPABASE_URL",
+  "SUPABASE_SERVICE_ROLE_KEY",
+].filter((key) => !process.env[key]);
 if (missingConfig.length > 0) {
   throw new Error(`Missing required environment variables: ${missingConfig.join(", ")}`);
 }
@@ -18,14 +22,9 @@ if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
   throw new Error("PORT must be an integer between 1 and 65535");
 }
 
-const attendeeSchema = new mongoose.Schema({
-  sessionId: { type: String, unique: true },
-  event: String,
-  name: String,
-  phone: String,
-  createdAt: { type: Date, default: Date.now },
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false },
 });
-const Attendee = mongoose.model("Attendee", attendeeSchema);
 
 const app = express();
 app.use(express.urlencoded({ extended: false })); // Africa's Talking sends form data
@@ -55,12 +54,11 @@ app.post("/ussd", async (req, res) => {
   if (name.length < 2) return res.send("END Invalid name. Please dial again.");
 
   try {
-    // upsert so a retried request in the same session doesn't create duplicates
-    await Attendee.updateOne(
-      { sessionId },
-      { $setOnInsert: { sessionId, event: EVENT_NAME, name, phone: phoneNumber } },
-      { upsert: true }
+    const { error } = await supabase.from("jace_event_attendees").upsert(
+      { session_id: sessionId, event: EVENT_NAME, name, phone: phoneNumber },
+      { onConflict: "session_id", ignoreDuplicates: true }
     );
+    if (error) throw error;
   } catch (err) {
     console.error("DB error:", err);
     return res.send("END Sorry, something went wrong. Please try again.");
@@ -71,12 +69,4 @@ app.post("/ussd", async (req, res) => {
   );
 });
 
-mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    app.listen(PORT, () => console.log(`USSD server running on port ${PORT}`));
-  })
-  .catch((err) => {
-    console.error("MongoDB connection failed:", err);
-    process.exitCode = 1;
-  });
+app.listen(PORT, () => console.log(`USSD server running on port ${PORT}`));

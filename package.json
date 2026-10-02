@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/agunda99/JACE_Node#readme",
   "dependencies": {
-    "express": "^5.2.1",
-    "mongoose": "^9.10.3"
+    "@supabase/supabase-js": "^2.117.2",
+    "express": "^5.2.1"
   }
 }

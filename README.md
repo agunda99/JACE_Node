@@ -5,21 +5,29 @@ A Node.js USSD callback for event ticket registration and Pochi la Biashara paym
 ## Requirements
 
 - Node.js 20.19 or newer
-- MongoDB, either local or hosted
+- A Supabase project
 
 ## Setup
 
-Install dependencies, then create a local `.env` file in the project root with your own settings:
+Install dependencies and create your local environment file:
+
+```powershell
+npm ci
+Copy-Item .env.example .env
+```
+
+Edit `.env` and fill in your event and Supabase project values. In the Supabase SQL Editor, run [`supabase/schema.sql`](supabase/schema.sql) to create the attendees table. Do not start the server until the required values are filled in.
 
 ```dotenv
 EVENT_NAME="Your Event Name"
 TICKET_PRICE=400
 POCHI_NUMBER=YOUR_POCHI_NUMBER
-MONGO_URI=mongodb://127.0.0.1:27017/events
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_SERVICE_ROLE_KEY
 PORT=3000
 ```
 
-`.env` contains private configuration and is ignored by Git. Do not commit it.
+Get the project URL and service-role key from your Supabase project settings. The service-role key bypasses row-level security; keep it server-side, never expose it in browser code, and do not commit `.env`. The local `.env` file is ignored by Git.
 
 ## Run
 
@@ -39,4 +47,4 @@ Check JavaScript syntax with:
 npm run check
 ```
 
-Configure Africa's Talking to send USSD callbacks to `https://YOUR-DOMAIN/ussd`. Use HTTPS for a deployed callback. This service stores attendee names and phone numbers in MongoDB; restrict database access and handle that data according to your privacy requirements.
+Configure Africa's Talking to send USSD callbacks to `https://YOUR-DOMAIN/ussd`. Use HTTPS for a deployed callback. This service stores attendee names and phone numbers in Supabase; restrict access and handle that data according to your privacy requirements.
